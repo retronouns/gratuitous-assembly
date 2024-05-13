@@ -1,13 +1,14 @@
-import { Writeable, Readable, ReadFormatter, WriteFormatter } from "./util.ts";
+import { Writeable, Readable } from "./util.ts";
 import { MemoryCell } from "./cell.ts";
+import { wordToChar } from "./util.ts";
+import { uIntToWord } from "./util.ts";
 
 export class Output implements Writeable {
   private buffer = "";
   write = (value: boolean[]) => {
     const cell = new MemoryCell();
     cell.write(value);
-    const formatter = new ReadFormatter(cell);
-    const char = formatter.readChar();
+    const char = wordToChar(cell.read());
     if (char === "\n") {
       console.log(this.buffer);
       this.buffer = "";
@@ -21,8 +22,7 @@ export class Input implements Readable {
   private buffer = "";
   read = () => {
     const cell = new MemoryCell();
-    const formatter = new WriteFormatter(cell);
-    formatter.writeUInt(this.buffer.charCodeAt(0));
+    cell.write(uIntToWord(this.buffer.charCodeAt(0)));
     return cell.read();
   };
 }

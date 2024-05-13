@@ -1,6 +1,13 @@
 import { MemoryCell } from "./cell.ts";
-import { ReadFormatter, WriteFormatter } from "./util.ts";
-import { AslRuntimeEnvironment } from "./asl.ts";
+import {
+  wordToUInt,
+  uIntToWord,
+  wordToInt,
+  intToWord,
+  wordToChar,
+  charToWord,
+} from "./util.ts";
+import { Asl } from "./asl.ts";
 // const file = await Deno.readTextFile("app.asl");
 
 // const lines = file.split("\n").map((line) => line.split(/\s+/));
@@ -8,34 +15,32 @@ import { AslRuntimeEnvironment } from "./asl.ts";
 // const asl = initAsl();
 
 const blankCell = new MemoryCell();
-console.log(`blankCell: ${new ReadFormatter(blankCell).readUInt()}`);
+console.log(`blankCell: ${wordToUInt(blankCell.read())}`);
 
 const uIntCell = new MemoryCell();
-const uIntCellReader = new ReadFormatter(uIntCell);
-const uIntCellWriter = new WriteFormatter(uIntCell);
-console.log(`uIntCell: ${uIntCellReader.readUInt()}`);
-uIntCellWriter.writeUInt(69);
-console.log(`uIntCell: ${uIntCellReader.readUInt()}`);
-uIntCellWriter.writeUInt(-93);
-console.log(`uIntCell: ${uIntCellReader.readUInt()}`);
+console.log(`uIntCell: ${wordToUInt(uIntCell.read())}`);
+uIntCell.write(uIntToWord(69));
+console.log(`uIntCell: ${wordToUInt(uIntCell.read())}`);
+uIntCell.write(uIntToWord(-93));
+console.log(`uIntCell: ${wordToUInt(uIntCell.read())}`);
 
 const intCell = new MemoryCell();
-const intCellReader = new ReadFormatter(intCell);
-const intCellWriter = new WriteFormatter(intCell);
-console.log(`intCell: ${intCellReader.readInt()}`);
-intCellWriter.writeInt(69);
-console.log(`intCell: ${intCellReader.readInt()}`);
-intCellWriter.writeInt(-93);
-console.log(`intCell: ${intCellReader.readInt()}`);
+console.log(`intCell: ${wordToInt(intCell.read())}`);
+intCell.write(intToWord(69));
+console.log(`intCell: ${wordToInt(intCell.read())}`);
+intCell.write(intToWord(-93));
+console.log(`intCell: ${wordToInt(intCell.read())}`);
 
 const charCell = new MemoryCell();
-const charCellReader = new ReadFormatter(charCell);
-const charCellWriter = new WriteFormatter(charCell);
-console.log(`charCell: ${charCellReader.readChar()}`);
-charCellWriter.writeChar("=");
-console.log(`charCell: ${charCellReader.readChar()}`);
+console.log(`charCell: ${wordToChar(charCell.read())}`);
+charCell.write(charToWord("="));
+console.log(`charCell: ${wordToChar(charCell.read())}`);
 
-const asl = new AslRuntimeEnvironment();
+const newlineCell = new MemoryCell();
+newlineCell.write(charToWord("\n"));
+console.log(wordToUInt(newlineCell.read()));
+
+const asl = new Asl();
 
 asl.flashInstructions("MOV 1 OUT");
 console.log(asl.dumpInstructions());
@@ -49,3 +54,6 @@ console.log(asl.dumpInstructions());
 
 asl.flashInstructions("MOV 6 OUT");
 console.log(asl.dumpInstructions());
+
+asl.flashInstructions("MOV 7 OUT\nMOV 8 OUT");
+console.log(asl.consumeInstruction());

@@ -1,11 +1,18 @@
 // deno-lint-ignore-file require-await
-import { WORD_LENGTH, WriteFormatter, ReadFormatter } from "./util.ts";
+import {
+  WORD_LENGTH,
+  Readable,
+  charToWord,
+  uIntToWord,
+  wordToUInt,
+  wordToChar,
+} from "./util.ts";
 import { MemoryCell } from "./cell.ts";
 
 const MEMORY_SIZE = 1 << WORD_LENGTH;
 
-export class AslRuntimeEnvironment {
-  public readonly instruction = new MemoryCell();
+export class Asl {
+  public readonly instructionPointer = new MemoryCell();
   public readonly accumulator = new MemoryCell();
   public readonly register = new MemoryCell();
   public readonly pointer = new MemoryCell();
@@ -19,12 +26,10 @@ export class AslRuntimeEnvironment {
 
   flashInstructions = (instructions: string) => {
     for (let i = 0; i < instructions.length; i++) {
-      const fmt = new WriteFormatter(this.memory[i]);
       const char = instructions[i];
-      fmt.writeChar(char);
+      this.memory[i].write(charToWord(char));
     }
-    const fmt = new WriteFormatter(this.memory[instructions.length]);
-    fmt.writeUInt(3); // ETX https://www.ascii-code.com/
+    this.memory[instructions.length].write(uIntToWord(3)); // ETX https://www.ascii-code.com/
   };
 
   dumpInstructions = () => {
@@ -32,11 +37,34 @@ export class AslRuntimeEnvironment {
     let charCode = 2; // STX https://www.ascii-code.com/
     let i = 0;
     while (![0, 3, 4].includes(charCode)) {
-      let fmt = new ReadFormatter(this.memory[i++]);
-      instructions += fmt.readChar();
-      fmt = new ReadFormatter(this.memory[i]);
-      charCode = fmt.readUInt();
+      instructions += wordToChar(this.memory[i++].read());
+      charCode = wordToUInt(this.memory[i].read());
     }
     return instructions;
+  };
+
+  consumeInstruction = () => {
+    let instruction = "";
+    let charCode = 2; // STX https://www.ascii-code.com/
+    const pc = this.instructionPointer;
+    while (![10, 13].includes(charCode)) {
+      instruction += wordToChar(this.memory[wordToUInt(pc.read())].read());
+      pc.write(Asl.add(pc, Asl.one));
+      charCode = wordToUInt(this.memory[wordToUInt(pc.read())].read());
+    }
+    pc.write(Asl.add(pc, Asl.one));
+    return instruction;
+  };
+
+  static readonly one = (() => {
+    const one = new MemoryCell();
+    one.write(uIntToWord(1));
+    return one;
+  })();
+
+  static add = (a: Readable, b: Readable) => {
+    const result = new MemoryCell();
+    result.write(uIntToWord(wordToUInt(a.read()) + wordToUInt(b.read())));
+    return result.read();
   };
 }
