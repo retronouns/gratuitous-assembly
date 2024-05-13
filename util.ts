@@ -1,14 +1,16 @@
+import { Word } from "./cell.ts";
+
 export const WORD_LENGTH = 16;
 
 export interface Writeable {
-  write: (value: boolean[]) => void;
+  write: (value: Readable) => void;
 }
 
 export interface Readable {
-  read: () => boolean[];
+  read: () => Word;
 }
 
-export const wordToUInt = (word: boolean[]) => {
+export const wordToUInt = (word: Word) => {
   let number = 0;
   for (let i = 0; i < WORD_LENGTH; i++) {
     number <<= 1;
@@ -17,7 +19,7 @@ export const wordToUInt = (word: boolean[]) => {
   return number;
 };
 
-export const wordToInt = (word: boolean[]) => {
+export const wordToInt = (word: Word) => {
   // two's compliment
   let number = word[0] ? -1 : 0;
   for (let i = 1; i < WORD_LENGTH; i++) {
@@ -27,12 +29,12 @@ export const wordToInt = (word: boolean[]) => {
   return number;
 };
 
-export const wordToChar = (word: boolean[]) => {
+export const wordToChar = (word: Word) => {
   return String.fromCharCode(wordToUInt(word));
 };
 
 export const uIntToWord = (uInt: number) => {
-  const value = new Array<boolean>(WORD_LENGTH);
+  const value = new Word();
   let number = uInt;
   for (let i = WORD_LENGTH - 1; i >= 0; i--) {
     value[i] = (number & 1) === 1;
@@ -43,7 +45,7 @@ export const uIntToWord = (uInt: number) => {
 
 export const intToWord = (int: number) => {
   // two's compliment
-  const value = new Array<boolean>(WORD_LENGTH);
+  const value = new Word();
   let number = int;
   value[0] = number < 0;
   for (let i = WORD_LENGTH - 1; i > 0; i--) {
@@ -57,10 +59,7 @@ export const charToWord = (char: string) => {
   return uIntToWord(char.charCodeAt(0));
 };
 
-export const $ToWord = (
-  value: boolean[] | string | number,
-  signed?: boolean
-) => {
+export const $ToWord = (value: Word | string | number, signed?: boolean) => {
   if (typeof value === "string") {
     return charToWord(value);
   } else if (typeof value === "number") {

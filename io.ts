@@ -5,7 +5,7 @@ import { uIntToWord } from "./util.ts";
 
 export class Output implements Writeable {
   private buffer = "";
-  write = (value: boolean[]) => {
+  write = (value: Readable) => {
     const cell = new MemoryCell();
     cell.write(value);
     const char = wordToChar(cell.read());
