@@ -1,6 +1,4 @@
-import { Word } from "./cell.ts";
-
-export const WORD_LENGTH = 16;
+import { Word, WORD_LENGTH } from "./cell.ts";
 
 export interface Writeable {
   write: (value: Readable) => void;

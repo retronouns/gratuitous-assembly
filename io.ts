@@ -6,15 +6,12 @@ import { uIntToWord } from "./util.ts";
 export class Output implements Writeable {
   private buffer = "";
   write = (value: Readable) => {
-    const cell = new Word();
-    cell.write(value);
-    const char = wordToChar(cell.read());
-    if (char === "\n") {
-      console.log(this.buffer);
-      this.buffer = "";
-    } else {
-      this.buffer += char;
-    }
+    this.buffer += wordToChar(value.read());
+  };
+
+  print = () => {
+    console.log(this.buffer);
+    this.buffer = "";
   };
 }
 

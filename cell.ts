@@ -1,7 +1,8 @@
 import type { Writeable, Readable } from "./util.ts";
-import { wordToUInt, WORD_LENGTH } from "./util.ts";
+import { wordToUInt } from "./util.ts";
 
-const MEMORY_SIZE = 1 << WORD_LENGTH;
+export const WORD_LENGTH = 16;
+export const MEMORY_SIZE = 1 << WORD_LENGTH;
 
 export class Word extends Array<boolean> implements Readable, Writeable {
   constructor() {
