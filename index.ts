@@ -7,7 +7,7 @@ import { Asl } from "./asl.ts";
 
 const asl = new Asl();
 
-const instructions = [
+const instructions1 = [
   `MOV 'H' OUT`,
   `MOV 'E' OUT`,
   `MOV 'L' OUT`,
@@ -22,5 +22,23 @@ const instructions = [
   `PRINT`,
 ];
 
-asl.flashInstructions(instructions);
+asl.flashInstructions(instructions1);
+asl.run();
+
+const instructions2 = [
+  `MOV 'F' OUT`,
+  `MOV 'O' OUT`,
+  `MOV 'O' OUT`,
+  `JEQ '1' '1'`,
+  `PRINT`,
+  `CLEAROUT`,
+  `MOV 'B' OUT`,
+  `MOV 'A' OUT`,
+  `MOV 'R' OUT`,
+  `JEQ '1' '0'`,
+  `PRINT`,
+  `CLEAROUT`,
+];
+
+asl.flashInstructions(instructions2);
 asl.run();

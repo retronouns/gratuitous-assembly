@@ -48,23 +48,14 @@ export class Asl {
   };
 
   run = () => {
+    this.instructionPointer.write(Asl.ZERO);
     while (!this.endOfFile()) {
       this.consumeInstruction();
     }
   };
 
   consumeInstruction = () => {
-    // read instruction from memory
-    let instruction = "";
-    let i = wordToUInt(this.instructionPointer);
-    let charCode = wordToUInt(this.memory[i]); // first char is STX https://www.ascii-code.com/
-    while (i < this.memory.length && ![0, 3, 4].includes(charCode)) {
-      if (charCode !== 2) {
-        instruction += wordToChar(this.memory[i]);
-      }
-      charCode = wordToUInt(this.memory[++i]);
-    }
-    this.instructionPointer.write(uIntToWord(i + 1));
+    const instruction = this.readInstruction();
 
     // parse instruction string
     const symbols = instruction.split(/\s+/);
@@ -77,15 +68,55 @@ export class Asl {
       const source = this.getSource(symbols[1]);
       const destination = this.getSink(symbols[2]);
       destination.write(source.read());
-    }
-    if (symbols[0] === "PRINT") {
+    } else if (symbols[0] === "CLEAROUT") {
+      this.output.buffer = "";
+    } else if (symbols[0] === "CLEARIN") {
+      this.input.buffer = "";
+    } else if (symbols[0] === "PRINT") {
       if (symbols.length !== 1) {
         throw new Error(
           `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
         );
       }
       this.output.print();
+    } else if (symbols[0] === "JEQ") {
+      if (symbols.length !== 3) {
+        throw new Error(
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+        );
+      }
+      const sourceA = this.getSource(symbols[1]);
+      const sourceB = this.getSource(symbols[2]);
+      if (wordToUInt(sourceA.read()) === wordToUInt(sourceB.read())) {
+        this.readInstruction();
+      }
+    } else if (symbols[0] === "JNE") {
+      if (symbols.length !== 3) {
+        throw new Error(
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+        );
+      }
+      const sourceA = this.getSource(symbols[1]);
+      const sourceB = this.getSource(symbols[2]);
+      if (wordToUInt(sourceA.read()) !== wordToUInt(sourceB.read())) {
+        this.readInstruction();
+      }
     }
+  };
+
+  readInstruction = () => {
+    // read instruction from memory
+    let instruction = "";
+    let i = wordToUInt(this.instructionPointer);
+    let charCode = wordToUInt(this.memory[i]); // first char is STX https://www.ascii-code.com/
+    while (i < this.memory.length && ![0, 3, 4].includes(charCode)) {
+      if (charCode !== 2) {
+        instruction += wordToChar(this.memory[i]);
+      }
+      charCode = wordToUInt(this.memory[++i]);
+    }
+    this.instructionPointer.write(uIntToWord(i + 1));
+    return instruction;
   };
 
   getSource = (source: string): Readable => {
