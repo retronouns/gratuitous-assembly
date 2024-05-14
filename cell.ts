@@ -1,5 +1,5 @@
 import type { Writeable, Readable } from "./util.ts";
-import { wordToUInt } from "./util.ts";
+import { ONE, wordToUInt, add } from "./util.ts";
 
 export const WORD_LENGTH = 16;
 export const MEMORY_SIZE = 1 << WORD_LENGTH;
@@ -32,10 +32,13 @@ export class MemoryBlock extends Array<Word> implements Writeable, Readable {
   }
 
   read = () => {
-    return this[wordToUInt(this.pointer.read())].read();
+    const word = this[wordToUInt(this.pointer.read())].read();
+    this.pointer.write(add(this.pointer, ONE));
+    return word;
   };
 
   write = (value: Readable) => {
     this[wordToUInt(this.pointer.read())].write(value);
+    this.pointer.write(add(this.pointer, ONE));
   };
 }

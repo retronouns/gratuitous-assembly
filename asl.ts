@@ -3,8 +3,12 @@ import {
   Writeable,
   charToWord,
   uIntToWord,
+  intToWord,
   wordToUInt,
   wordToChar,
+  wordToInt,
+  ZERO,
+  add,
 } from "./util.ts";
 import { Word, MemoryBlock } from "./cell.ts";
 import { Input, Output } from "./io.ts";
@@ -48,7 +52,7 @@ export class Asl {
   };
 
   run = () => {
-    this.instructionPointer.write(Asl.ZERO);
+    this.instructionPointer.write(ZERO);
     while (!this.endOfFile()) {
       this.consumeInstruction();
     }
@@ -68,6 +72,15 @@ export class Asl {
       const source = this.getSource(symbols[1]);
       const destination = this.getSink(symbols[2]);
       destination.write(source.read());
+    } else if (symbols[0] === "ADD") {
+      if (symbols.length !== 3) {
+        throw new Error(
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+        );
+      }
+      const sourceA = this.getSource(symbols[1]);
+      const sourceB = this.getSource(symbols[2]);
+      this.accumulator.write(add(sourceA, sourceB));
     } else if (symbols[0] === "CLEAROUT") {
       this.output.buffer = "";
     } else if (symbols[0] === "CLEARIN") {
@@ -101,6 +114,28 @@ export class Asl {
       if (wordToUInt(sourceA.read()) !== wordToUInt(sourceB.read())) {
         this.readInstruction();
       }
+    } else if (symbols[0] === "JRL") {
+      if (symbols.length !== 2) {
+        throw new Error(
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+        );
+      }
+      const source = this.getSource(symbols[1]);
+      let rel = wordToInt(source.read()) - 1;
+      while (rel > 0) {
+        rel--;
+        this.readInstruction();
+      }
+      while (rel < 0) {
+        rel++;
+        this.reverseInstruction();
+      }
+    } else if (symbols[0] === "NOP") {
+      if (symbols.length !== 1) {
+        throw new Error(
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+        );
+      }
     }
   };
 
@@ -119,8 +154,18 @@ export class Asl {
     return instruction;
   };
 
+  reverseInstruction = () => {
+    let i = wordToUInt(this.instructionPointer) - 1;
+    let charCode = wordToUInt(this.memory[i]); // last char is ETX https://www.ascii-code.com/
+    while (i >= 0 && ![0, 2, 4].includes(charCode)) {
+      charCode = wordToUInt(this.memory[--i]);
+    }
+    this.instructionPointer.write(uIntToWord(i));
+  };
+
   getSource = (source: string): Readable => {
     const charLiteral = source.match(/'(.)'/)?.[1];
+    const intLiteral = source.match(/-?[0-9]+/)?.[0];
     if (source === "ACC") {
       return this.accumulator;
     } else if (source === "REG") {
@@ -135,6 +180,8 @@ export class Asl {
       return this.instructionPointer;
     } else if (charLiteral) {
       return charToWord(charLiteral);
+    } else if (intLiteral) {
+      return intToWord(Number.parseInt(intLiteral));
     } else {
       throw new Error(
         `Unknown datasource ${source} on line ${wordToUInt(
@@ -167,21 +214,4 @@ export class Asl {
   };
 
   executeInstruction = () => {};
-
-  static readonly ONE = (() => {
-    const one = new Word();
-    one.write(uIntToWord(1));
-    return one;
-  })();
-
-  static readonly ZERO = (() => {
-    const zero = new Word();
-    return zero;
-  })();
-
-  static add = (a: Readable, b: Readable) => {
-    const result = new Word();
-    result.write(uIntToWord(wordToUInt(a.read()) + wordToUInt(b.read())));
-    return result.read();
-  };
 }

@@ -70,3 +70,20 @@ export const $ToWord = (value: Word | string | number, signed?: boolean) => {
     return value;
   }
 };
+
+export const add = (a: Readable, b: Readable) => {
+  const result = new Word();
+  result.write(uIntToWord(wordToUInt(a.read()) + wordToUInt(b.read())));
+  return result.read();
+};
+
+export const ONE = (() => {
+  const one = new Word();
+  one.write(uIntToWord(1));
+  return one;
+})();
+
+export const ZERO = (() => {
+  const zero = new Word();
+  return zero;
+})();
