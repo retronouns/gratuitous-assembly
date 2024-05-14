@@ -19,21 +19,22 @@ export class Word extends Array<boolean> implements Readable, Writeable {
   };
 }
 
-export class MemoryBlock implements Writeable, Readable {
+export class MemoryBlock extends Array<Word> implements Writeable, Readable {
   public readonly pointer = new Word();
-  private readonly memory = (() => {
-    const array = new Array<Word>(MEMORY_SIZE);
+
+  constructor() {
+    super();
+    this.length = MEMORY_SIZE;
     for (let i = 0; i < MEMORY_SIZE; i++) {
-      array[i] = new Word();
+      this[i] = new Word();
     }
-    return array;
-  })();
+  }
 
   read = () => {
-    return this.memory[wordToUInt(this.pointer.read())].read();
+    return this[wordToUInt(this.pointer.read())].read();
   };
 
   write = (value: Readable) => {
-    this.memory[wordToUInt(this.pointer.read())].write(value);
+    this[wordToUInt(this.pointer.read())].write(value);
   };
 }
