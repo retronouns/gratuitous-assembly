@@ -100,6 +100,8 @@ export class Asl {
       return this.memory.pointer;
     } else if (source === "IN") {
       return this.input;
+    } else if (source === "IPT") {
+      return this.instructionPointer;
     } else if (charLiteral) {
       return charToWord(charLiteral);
     } else {
@@ -122,6 +124,8 @@ export class Asl {
       return this.memory.pointer;
     } else if (sink === "OUT") {
       return this.output;
+    } else if (sink === "IPT") {
+      return this.instructionPointer;
     } else {
       throw new Error(
         `Unknown datasink ${sink} on line ${wordToUInt(
