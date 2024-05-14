@@ -5,12 +5,12 @@ import {
   wordToUInt,
   wordToChar,
 } from "./util.ts";
-import { MemoryCell, MemoryBlock } from "./cell.ts";
+import { Word, MemoryBlock } from "./cell.ts";
 
 export class Asl {
-  public readonly instructionPointer = new MemoryCell();
-  public readonly accumulator = new MemoryCell();
-  public readonly register = new MemoryCell();
+  public readonly instructionPointer = new Word();
+  public readonly accumulator = new Word();
+  public readonly register = new Word();
   public readonly memory = new MemoryBlock();
 
   flashInstructions = (instructions: string) => {
@@ -35,6 +35,10 @@ export class Asl {
     return instructions;
   };
 
+  resetInstructionPointer = () => {
+    this.instructionPointer.write(Asl.zero);
+  };
+
   consumeInstruction = () => {
     let instruction = "";
     let charCode = 2; // STX https://www.ascii-code.com/
@@ -51,18 +55,18 @@ export class Asl {
   };
 
   static readonly one = (() => {
-    const one = new MemoryCell();
+    const one = new Word();
     one.write(uIntToWord(1));
     return one;
   })();
 
   static readonly zero = (() => {
-    const zero = new MemoryCell();
+    const zero = new Word();
     return zero;
   })();
 
   static add = (a: Readable, b: Readable) => {
-    const result = new MemoryCell();
+    const result = new Word();
     result.write(uIntToWord(wordToUInt(a.read()) + wordToUInt(b.read())));
     return result.read();
   };

@@ -1,4 +1,4 @@
-import { MemoryCell } from "./cell.ts";
+import { Word } from "./cell.ts";
 import {
   wordToUInt,
   uIntToWord,
@@ -14,29 +14,29 @@ import { Asl } from "./asl.ts";
 
 // const asl = initAsl();
 
-const blankCell = new MemoryCell();
+const blankCell = new Word();
 console.log(`blankCell: ${wordToUInt(blankCell.read())}`);
 
-const uIntCell = new MemoryCell();
+const uIntCell = new Word();
 console.log(`uIntCell: ${wordToUInt(uIntCell.read())}`);
 uIntCell.write(uIntToWord(69));
 console.log(`uIntCell: ${wordToUInt(uIntCell.read())}`);
 uIntCell.write(uIntToWord(-93));
 console.log(`uIntCell: ${wordToUInt(uIntCell.read())}`);
 
-const intCell = new MemoryCell();
+const intCell = new Word();
 console.log(`intCell: ${wordToInt(intCell.read())}`);
 intCell.write(intToWord(69));
 console.log(`intCell: ${wordToInt(intCell.read())}`);
 intCell.write(intToWord(-93));
 console.log(`intCell: ${wordToInt(intCell.read())}`);
 
-const charCell = new MemoryCell();
+const charCell = new Word();
 console.log(`charCell: ${wordToChar(charCell.read())}`);
 charCell.write(charToWord("="));
 console.log(`charCell: ${wordToChar(charCell.read())}`);
 
-const newlineCell = new MemoryCell();
+const newlineCell = new Word();
 newlineCell.write(charToWord("\n"));
 console.log(wordToUInt(newlineCell.read()));
 
@@ -56,4 +56,9 @@ asl.flashInstructions("MOV 6 OUT");
 console.log(asl.dumpInstructions());
 
 asl.flashInstructions("MOV 7 OUT\nMOV 8 OUT");
+console.log(asl.consumeInstruction());
+asl.resetInstructionPointer();
+
+asl.flashInstructions(`MOV 9 OUT
+MOV 10 OUT`);
 console.log(asl.consumeInstruction());
