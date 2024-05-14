@@ -21,8 +21,6 @@ const instructions = [
   `MOV 'D' OUT`,
   `PRINT`,
 ];
+
 asl.flashInstructions(instructions);
-asl.dumpInstructions();
-for (const _ of instructions) {
-  asl.consumeInstruction();
-}
+asl.run();

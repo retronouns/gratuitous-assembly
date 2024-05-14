@@ -18,25 +18,17 @@ export class Asl {
   public readonly output = new Output();
 
   flashInstructions = (instructions: string[]) => {
-    this.memory.pointer.write(Asl.ZERO);
-
+    let k = 0;
     for (let i = 0; i < instructions.length; i++) {
       const instruction = instructions[i];
-
-      this.memory.write(uIntToWord(2)); // STX https://www.ascii-code.com/
-      this.memory.pointer.write(Asl.add(this.memory.pointer, Asl.ONE));
-
+      this.memory[k++].write(uIntToWord(2)); // STX https://www.ascii-code.com/
       for (let j = 0; j < instruction.length; j++) {
         const char = instruction[j];
-
-        this.memory.write(charToWord(char));
-        this.memory.pointer.write(Asl.add(this.memory.pointer, Asl.ONE));
+        this.memory[k++].write(charToWord(char));
       }
-
-      this.memory.write(uIntToWord(3)); // ETX https://www.ascii-code.com/
-      this.memory.pointer.write(Asl.add(this.memory.pointer, Asl.ONE));
+      this.memory[k++].write(uIntToWord(3)); // ETX https://www.ascii-code.com/
     }
-    this.memory.write(uIntToWord(4)); // EOT https://www.ascii-code.com/
+    this.memory[k++].write(uIntToWord(4)); // EOT https://www.ascii-code.com/
   };
 
   dumpInstructions = () => {
@@ -48,24 +40,31 @@ export class Asl {
         instructions += charCode === 3 ? "\n" : wordToChar(this.memory[i]);
       }
     }
-
     return instructions;
+  };
+
+  endOfFile = () => {
+    return wordToUInt(this.memory[wordToUInt(this.instructionPointer)]) === 4;
+  };
+
+  run = () => {
+    while (!this.endOfFile()) {
+      this.consumeInstruction();
+    }
   };
 
   consumeInstruction = () => {
     // read instruction from memory
     let instruction = "";
-    const pc = this.instructionPointer;
-    this.memory.pointer.write(pc);
-    let charCode = wordToUInt(this.memory.read()); // first char is STX https://www.ascii-code.com/
-    while (![0, 3, 4].includes(charCode)) {
+    let i = wordToUInt(this.instructionPointer);
+    let charCode = wordToUInt(this.memory[i]); // first char is STX https://www.ascii-code.com/
+    while (i < this.memory.length && ![0, 3, 4].includes(charCode)) {
       if (charCode !== 2) {
-        instruction += wordToChar(this.memory.read());
+        instruction += wordToChar(this.memory[i]);
       }
-      this.memory.pointer.write(Asl.add(this.memory.pointer, Asl.ONE));
-      charCode = wordToUInt(this.memory.read());
+      charCode = wordToUInt(this.memory[++i]);
     }
-    pc.write(Asl.add(this.memory.pointer, Asl.ONE));
+    this.instructionPointer.write(uIntToWord(i + 1));
 
     // parse instruction string
     const symbols = instruction.split(/\s+/);
