@@ -22,6 +22,7 @@ const instructions = [
   `PRINT`,
 ];
 asl.flashInstructions(instructions);
+asl.dumpInstructions();
 for (const _ of instructions) {
   asl.consumeInstruction();
 }

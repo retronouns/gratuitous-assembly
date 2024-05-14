@@ -40,16 +40,13 @@ export class Asl {
   };
 
   dumpInstructions = () => {
-    this.memory.pointer.write(Asl.ZERO);
-
     let instructions = "";
-    let charCode = wordToUInt(this.memory.read()); // first char is STX https://www.ascii-code.com/
-    while (![0, 4].includes(charCode)) {
+    let charCode = 2;
+    for (let i = 0; i < this.memory.length && ![0, 4].includes(charCode); i++) {
+      charCode = wordToUInt(this.memory[i]);
       if (charCode !== 2) {
-        instructions += charCode === 3 ? "\n" : wordToChar(this.memory.read());
+        instructions += charCode === 3 ? "\n" : wordToChar(this.memory[i]);
       }
-      this.memory.pointer.write(Asl.add(this.memory.pointer, Asl.ONE));
-      charCode = wordToUInt(this.memory.read());
     }
 
     return instructions;
