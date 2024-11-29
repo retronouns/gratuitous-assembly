@@ -10,7 +10,7 @@ import {
   Writeable,
   ZERO,
 } from "./util.ts";
-import { MemoryBlock, Word } from "./cell.ts";
+import { MemoryBlock, Word } from "./memory.ts";
 import { Input, Output } from "./io.ts";
 
 export class Asl {

@@ -1,4 +1,4 @@
-import { Word, WORD_LENGTH } from "./cell.ts";
+import { Word, WORD_LENGTH } from "./memory.ts";
 
 export interface Writeable {
   write: (value: Readable) => void;

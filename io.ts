@@ -1,5 +1,5 @@
 import { Readable, Writeable } from "./util.ts";
-import { Word } from "./cell.ts";
+import { Word } from "./memory.ts";
 import { wordToChar } from "./util.ts";
 import { uIntToWord } from "./util.ts";
 
