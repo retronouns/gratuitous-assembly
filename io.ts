@@ -1,4 +1,4 @@
-import { Writeable, Readable } from "./util.ts";
+import { Readable, Writeable } from "./util.ts";
 import { Word } from "./cell.ts";
 import { wordToChar } from "./util.ts";
 import { uIntToWord } from "./util.ts";

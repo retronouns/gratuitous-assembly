@@ -1,5 +1,5 @@
-import type { Writeable, Readable } from "./util.ts";
-import { ONE, wordToUInt, add } from "./util.ts";
+import type { Readable, Writeable } from "./util.ts";
+import { add, ONE, wordToUInt } from "./util.ts";
 
 export const WORD_LENGTH = 16;
 export const MEMORY_SIZE = 1 << WORD_LENGTH;

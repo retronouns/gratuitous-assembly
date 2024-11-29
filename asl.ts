@@ -1,16 +1,16 @@
 import {
-  Readable,
-  Writeable,
+  add,
   charToWord,
-  uIntToWord,
   intToWord,
-  wordToUInt,
+  Readable,
+  uIntToWord,
   wordToChar,
   wordToInt,
+  wordToUInt,
+  Writeable,
   ZERO,
-  add,
 } from "./util.ts";
-import { Word, MemoryBlock } from "./cell.ts";
+import { MemoryBlock, Word } from "./cell.ts";
 import { Input, Output } from "./io.ts";
 
 export class Asl {
@@ -66,7 +66,7 @@ export class Asl {
     if (symbols[0] === "MOV") {
       if (symbols.length !== 3) {
         throw new Error(
-          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
       const source = this.getSource(symbols[1]);
@@ -75,7 +75,7 @@ export class Asl {
     } else if (symbols[0] === "ADD") {
       if (symbols.length !== 3) {
         throw new Error(
-          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
       const sourceA = this.getSource(symbols[1]);
@@ -88,14 +88,14 @@ export class Asl {
     } else if (symbols[0] === "PRINT") {
       if (symbols.length !== 1) {
         throw new Error(
-          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
       this.output.print();
     } else if (symbols[0] === "JEQ") {
       if (symbols.length !== 3) {
         throw new Error(
-          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
       const sourceA = this.getSource(symbols[1]);
@@ -106,7 +106,7 @@ export class Asl {
     } else if (symbols[0] === "JNE") {
       if (symbols.length !== 3) {
         throw new Error(
-          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
       const sourceA = this.getSource(symbols[1]);
@@ -117,7 +117,7 @@ export class Asl {
     } else if (symbols[0] === "JRL") {
       if (symbols.length !== 2) {
         throw new Error(
-          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
       const source = this.getSource(symbols[1]);
@@ -133,7 +133,7 @@ export class Asl {
     } else if (symbols[0] === "NOP") {
       if (symbols.length !== 1) {
         throw new Error(
-          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`
+          `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
     }
@@ -184,9 +184,11 @@ export class Asl {
       return intToWord(Number.parseInt(intLiteral));
     } else {
       throw new Error(
-        `Unknown datasource ${source} on line ${wordToUInt(
-          this.instructionPointer.read()
-        )}`
+        `Unknown datasource ${source} on line ${
+          wordToUInt(
+            this.instructionPointer.read(),
+          )
+        }`,
       );
     }
   };
@@ -206,9 +208,11 @@ export class Asl {
       return this.instructionPointer;
     } else {
       throw new Error(
-        `Unknown datasink ${sink} on line ${wordToUInt(
-          this.instructionPointer.read()
-        )}`
+        `Unknown datasink ${sink} on line ${
+          wordToUInt(
+            this.instructionPointer.read(),
+          )
+        }`,
       );
     }
   };
