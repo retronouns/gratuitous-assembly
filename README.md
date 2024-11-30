@@ -1,3 +1,3 @@
 # Gratuitous Assembly
 
-A low-complexity assembly-like programming language intended for educational or recreational use.
+A typescript interpreter for a low-complexity assembly-like programming language. Intended for educational or recreational use.
