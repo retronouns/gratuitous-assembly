@@ -1,4 +1,4 @@
-import { Asl } from "./asl.ts";
+import { Asl } from "./gasm.ts";
 // const file = await Deno.readTextFile("app.asl");
 
 // const lines = file.split("\n").map((line) => line.split(/\s+/));
