@@ -69,8 +69,8 @@ export class Asl {
           `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
-      const source = this.getSource(symbols[1]);
-      const destination = this.getSink(symbols[2]);
+      const source = this.getReadable(symbols[1]);
+      const destination = this.getWriteable(symbols[2]);
       destination.write(source.read());
     } else if (symbols[0] === "ADD") {
       if (symbols.length !== 3) {
@@ -78,8 +78,8 @@ export class Asl {
           `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
-      const sourceA = this.getSource(symbols[1]);
-      const sourceB = this.getSource(symbols[2]);
+      const sourceA = this.getReadable(symbols[1]);
+      const sourceB = this.getReadable(symbols[2]);
       this.accumulator.write(add(sourceA, sourceB));
     } else if (symbols[0] === "CLEAROUT") {
       this.output.buffer = "";
@@ -98,8 +98,8 @@ export class Asl {
           `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
-      const sourceA = this.getSource(symbols[1]);
-      const sourceB = this.getSource(symbols[2]);
+      const sourceA = this.getReadable(symbols[1]);
+      const sourceB = this.getReadable(symbols[2]);
       if (wordToUInt(sourceA.read()) === wordToUInt(sourceB.read())) {
         this.readInstruction();
       }
@@ -109,8 +109,8 @@ export class Asl {
           `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
-      const sourceA = this.getSource(symbols[1]);
-      const sourceB = this.getSource(symbols[2]);
+      const sourceA = this.getReadable(symbols[1]);
+      const sourceB = this.getReadable(symbols[2]);
       if (wordToUInt(sourceA.read()) !== wordToUInt(sourceB.read())) {
         this.readInstruction();
       }
@@ -120,7 +120,7 @@ export class Asl {
           `Syntax error on line ${wordToUInt(this.instructionPointer.read())}`,
         );
       }
-      const source = this.getSource(symbols[1]);
+      const source = this.getReadable(symbols[1]);
       let rel = wordToInt(source.read()) - 1;
       while (rel > 0) {
         rel--;
@@ -163,20 +163,20 @@ export class Asl {
     this.instructionPointer.write(uIntToWord(i));
   };
 
-  getSource = (source: string): Readable => {
-    const charLiteral = source.match(/'(.)'/)?.[1];
-    const intLiteral = source.match(/-?[0-9]+/)?.[0];
-    if (source === "ACC") {
+  getReadable = (readable: string): Readable => {
+    const charLiteral = readable.match(/'(.)'/)?.[1];
+    const intLiteral = readable.match(/-?[0-9]+/)?.[0];
+    if (readable === "ACC") {
       return this.accumulator;
-    } else if (source === "REG") {
+    } else if (readable === "REG") {
       return this.register;
-    } else if (source === "MEM") {
+    } else if (readable === "MEM") {
       return this.memory;
-    } else if (source === "IDX") {
+    } else if (readable === "IDX") {
       return this.memory.pointer;
-    } else if (source === "IN") {
+    } else if (readable === "IN") {
       return this.input;
-    } else if (source === "IPT") {
+    } else if (readable === "IPT") {
       return this.instructionPointer;
     } else if (charLiteral) {
       return charToWord(charLiteral);
@@ -184,7 +184,7 @@ export class Asl {
       return intToWord(Number.parseInt(intLiteral));
     } else {
       throw new Error(
-        `Unknown datasource ${source} on line ${
+        `Unknown Readable ${readable} on line ${
           wordToUInt(
             this.instructionPointer.read(),
           )
@@ -193,22 +193,22 @@ export class Asl {
     }
   };
 
-  getSink = (sink: string): Writeable => {
-    if (sink === "ACC") {
+  getWriteable = (writeable: string): Writeable => {
+    if (writeable === "ACC") {
       return this.accumulator;
-    } else if (sink === "REG") {
+    } else if (writeable === "REG") {
       return this.register;
-    } else if (sink === "MEM") {
+    } else if (writeable === "MEM") {
       return this.memory;
-    } else if (sink === "IDX") {
+    } else if (writeable === "IDX") {
       return this.memory.pointer;
-    } else if (sink === "OUT") {
+    } else if (writeable === "OUT") {
       return this.output;
-    } else if (sink === "IPT") {
+    } else if (writeable === "IPT") {
       return this.instructionPointer;
     } else {
       throw new Error(
-        `Unknown datasink ${sink} on line ${
+        `Unknown Writeable ${writeable} on line ${
           wordToUInt(
             this.instructionPointer.read(),
           )
